@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DecaPedia</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web:300,400,500,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Dongle:300,400,500,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+  body {
+    font-family: 'Titillium Web', sans-serif;
+    background-image: url('image/background.jpeg');
+    background-size: cover;
+    height: 100vh;
+  }
+  #nav {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     background-color: rgba(0, 0, 0, 0.7);
+     padding: 20px;
+     display: inline-block;
+     justify-content: space-between;
+     align-items: center;
+     z-index: 1000;
+     height: 30px;
+     margin-bottom: 80px;
+  }
+  #header {
+    font-family: 'Dongle';
+    margin-top: -5px;
+    color: white;
+    font-size: 24px;
+  }
+  .container {
+    margin-top: 50px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .search-container {
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: inline-block;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .search-container input[type="text"] {
+    width: 230px;
+    height: 40px;
+    border: none;
+    border-bottom: 2px solid darkorange;
+    outline: none;
+    font-size: 16px;
+    margin-bottom: 20px;
+    font-family: 'Titillium Web';
+    border-radius: 5px;
+  }
+  .search-container input[type="text"]:focus {
+    border-bottom: 2px solid gold;
+  }
+  .search-container button {
+    background-color: darkorange;
+    color: #fff;
+    border: none;
+    width: 50px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+  }
+  .search-container button:hover {
+    background-color: gold;
+  }
+  .result-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .result-item:hover {
+    transform: translateY(-5px);
+  }
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .result-thumbnail {
+    width: 100px; /* Adjust size as needed */
+    height: auto;
+    margin-right: 20px;
+    border-radius: 5px;
+  }
+  .result-title {
+    color: #007bff;
+    font-size: 18px;
+    margin-right: 10px;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: block;
+  }
+  .result-title:hover {
+    color: #0056b3;
+  }
+  .speaker-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.3s ease;
+  }
+  .speaker-button:hover {
+    background-color: #0056b3;
+  }
+  .icon {
+    font-size: 18px;
+    margin-right: 5px;
+  }
+  .result-extract {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .interface {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.95);
+    z-index: 9999;
+    padding: 20px;
+    overflow-y: auto;
+    animation: slideIn 0.3s ease-in-out;
+  }
+  .interface.active {
+    display: block;
+  }
+  .interface-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    margin: 0 auto; /* Center the container */
+    max-width: 80%; /* Limit container width */
+    margin-left: -10px;
+  }
+  .interface-title {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .interface-text {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.5;
+    text-align: justify;
+  }
+  .factsheet {
+    margin-top: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+    text-align: center; /* Center the content */
+  }
+  .factsheet-title {
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .factsheet-content {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+    max-width: 90%;
+  }
+  .loading-icon {
+    color: #007bff;
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  .back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    cursor: pointer;
+    color: #007bff;
+    font-size: 20px;
+    transition: color 0.3s ease;
+  }
+  .back-button:hover {
+    color: #0056b3;
+  }
+  /* Styles for different parts of speech */
+  .noun {
+    color: #4CAF50; /* Green */
+  }
+  .verb {
+    color: #2196F3; /* Blue */
+  }
+  .adjective {
+    color: #FFC107; /* Yellow */
+  }
+  .interjection {
+    color: #FF5722; /* Orange */
+  }
+</style>
+</head>
+<body>
+   <div id="nav">
+      <h1 id="header">
+         DecaPedia
+      </h1>
+   </div>
+<div class="container">
+  <div class="search-container">
+    <input id="searchInput" type="text" placeholder="Enter a word to search" class="validate">
+    <button id="searchButton" class="btn waves-effect waves-light" type="submit" name="action"><i class="material-icons">search</i></button>
+     </div>
+  <div id="result"></div>
+</div>
+
+<!-- Interface for each search result -->
+<div class="interface" id="interfaceContainer">
+  <i class="fas fa-arrow-left back-button"></i>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Event listener for back button click
+  $(document).on('click', '.back-button', function(){
+    $('.interface').removeClass('active');
+  });
+
+  // Event listener for search button click
+  $('#searchButton').click(function(){
+    var searchTerm = $('#searchInput').val();
+    if(searchTerm !== ''){
+      // Display loading icon
+      $('#result').html('<i class="fas fa-spinner fa-spin loading-icon"></i>');
+
+      // Fetch search results from Wikipedia API
+      $.ajax({
+        url: 'https://en.wikipedia.org/w/api.php',
+        data: {
+          action: 'query',
+          format: 'json',
+          prop: 'extracts|pageimages', // Add pageimages to fetch thumbnails
+          generator: 'search',
+          exsentences: 3,
+          exlimit: 10,
+          exintro: 1,
+          explaintext: 1,
+          gsrlimit: 10,
+          gsrsearch: searchTerm,
+          piprop: 'thumbnail', // Request thumbnail
+          pilimit: 10
+        },
+        dataType: 'jsonp',
+        success: function(response){
+          // Clear previous search results
+          $('#result').empty();
+          // Process search results
+          if(response.query && response.query.pages){
+            $.each(response.query.pages, function(index, page){
+              var title = page.title;
+              var extract = page.extract;
+              var thumbnailUrl = page.thumbnail ? page.thumbnail.source : ''; // Check if thumbnail exists
+              // Create result item HTML
+              var resultItem = '<div class="result-item" data-title="' + title + '" data-extract="' + extract + '">';
+              resultItem += '<div class="result-header">';
+              resultItem += '<img src="' + thumbnailUrl + '" class="result-thumbnail">'; // Add thumbnail image
+              resultItem += '<a class="result-title">' + title + '</a>';
+              resultItem += '<button class="speaker-button"><i class="fas fa-volume-up"></i></button>';
+              resultItem += '</div>'; // Close result-header div
+              resultItem += '<p class="result-extract">' + extract + '</p>';
+              resultItem += '</div>'; // Close result-item div
+              // Append result item to result container
+              $('#result').append(resultItem);
+            });
+          } else {
+            $('#result').html('<p>No results found.</p>');
+          }
+        },
+        error: function(){
+          $('#result').html('<p>Failed to fetch information. Please try again later.</p>');
+        }
+      });
+    } else {
+      alert('Please enter a search term');
+    }
+  });
+
+  // Event listener for speaker button click
+  $(document).on('click', '.speaker-button', function(){
+    var title = $(this).closest('.result-item').data('title');
+    // Fetch pronunciation from Dictionary API
+    $.ajax({
+      url: 'https://api.dictionaryapi.dev/api/v2/entries/en/' + title,
+      dataType: 'json',
+      success: function(response){
+        if(response && response.length > 0){
+          var phonetics = response[0].phonetics;
+          if (phonetics && phonetics.length > 0) {
+            // Get the first phonetic pronunciation
+            var audioUrl = phonetics[0].audio;
+            // Create an audio element and play the pronunciation
+            var audio = new Audio(audioUrl);
+            audio.play();
+          } else {
+            alert('No pronunciation available for ' + title);
+          }
+        } else {
+          alert('Failed to fetch pronunciation for ' + title);
+        }
+      },
+      error: function(){
+        alert('Failed to fetch pronunciation for ' + title);
+      }
+    });
+  });
+
+  // Event listener for search result click
+  $(document).on('click', '.result-item', function(){
+    var title = $(this).data('title');
+    var extract = $(this).data('extract');
+    var interfaceContent = '<div class="interface-content">';
+    interfaceContent += '<i class="fas fa-arrow-left back-button"></i>';
+    interfaceContent += '<h2 class="interface-title">' + title + '</h2>';
+    interfaceContent += '<p class="interface-text">' + extract + '</p>';
+    interfaceContent += '</div>';
+
+    // Fetch additional information from Dictionary API
+    var searchTerm = title; // Using the same title for Dictionary API search
+    $.ajax({
+      url: 'https://api.dictionaryapi.dev/api/v2/entries/en/' + searchTerm,
+      dataType: 'json',
+      success: function(response){
+        if(response && response.length > 0){
+          interfaceContent += '<div class="factsheet">';
+          interfaceContent += '<h3 class="factsheet-title">Dictionary Definitions</h3>';
+          $.each(response, function(index, entry){
+            var meanings = entry.meanings;
+            if (meanings && meanings.length > 0) {
+              meanings.forEach(function(meaning) {
+                var pos = meaning.partOfSpeech;
+                var iconClass = '';
+                switch(pos) {
+                  case 'noun':
+                    iconClass = 'fas fa-book noun';
+                    break;
+                  case 'verb':
+                    iconClass = 'fas fa-feather-alt verb';
+                    break;
+                  case 'adjective':
+                    iconClass = 'fas fa-star adjective';
+                    break;
+                  case 'interjection':
+                    iconClass = 'fas fa-exclamation interjection';
+                    break;
+                  // Add more cases for other parts of speech if needed
+                }
+                interfaceContent += '<p class="factsheet-content"><i class="' + iconClass + ' icon"></i>' + pos + ': ' + meaning.definitions[0].definition + '</p>';
+              });
+            }
+          });
+          interfaceContent += '</div>'; // Close factsheet div
+        }
+        $('#interfaceContainer').html(interfaceContent);
+        $('.interface').addClass('active');
+      },
+      error: function(){
+        interfaceContent += '<div class="factsheet">';
+        interfaceContent += '<h3 class="factsheet-title">Dictionary Definitions</h3>';
+        interfaceContent += '<p class="factsheet-content">Failed to fetch dictionary information.</p>';
+        interfaceContent += '</div>'; // Close factsheet div
+        $('#interfaceContainer').html(interfaceContent);
+        $('.interface').addClass('active');
+      }
+    });
+  });
+  
+  // Close interface on click outside
+  $(document).mouseup(function(e) {
+    var container = $(".interface");
+    if (!container.is(e.target) && container.has(e.target).length === 0) {
+      container.removeClass('active');
+    }
+  });
+});
+</script>
+</body>
+</html>
